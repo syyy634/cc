@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>ㄷㄷ 게시글 삭제 도구</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body style="font-family: sans-serif; padding: 50px; text-align: center;">
+    <h1>'ㄷㄷ' 게시글 삭제 중...</h1>
+    <div id="status">연결 중...</div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: 'AIzaSyBBTIKKY3Eof0vcP7dtO3W8bqSVKlkpQas',
+            authDomain: 'axon-project-6ac75.firebaseapp.com',
+            projectId: 'axon-project-6ac75',
+            storageBucket: 'axon-project-6ac75.firebasestorage.app',
+            messagingSenderId: '864930393669',
+            appId: '1:864930393669:web:a22430068659405f53fd2c'
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const statusDiv = document.getElementById('status');
+
+        async function deletePosts() {
+            try {
+                const snapshot = await db.collection("posts").where("title", "==", "ㄷㄷ").get();
+                if (snapshot.empty) {
+                    statusDiv.innerText = "'ㄷㄷ' 제목의 글을 찾을 수 없습니다.";
+                    return;
+                }
+
+                let count = 0;
+                const batch = db.batch();
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                    count++;
+                });
+
+                await batch.commit();
+                statusDiv.innerText = `총 ${count}개의 'ㄷㄷ' 게시글을 삭제했습니다.`;
+                statusDiv.style.color = "green";
+            } catch (error) {
+                statusDiv.innerText = "오류 발생: " + error.message;
+                statusDiv.style.color = "red";
+            }
+        }
+
+        deletePosts();
+    </script>
+</body>
+</html>

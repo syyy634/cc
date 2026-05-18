@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커뮤니티 포럼 - Axon</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase Compat SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        .forum-item {
+            position: relative;
+        }
+        .post-actions {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .forum-item:hover .post-actions {
+            opacity: 1;
+        }
+        .btn-icon {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid #E5E5E7;
+            background: white;
+            color: #515154;
+            transition: all 0.2s ease;
+        }
+        .btn-icon:hover {
+            background: #F4F4F5;
+            color: var(--accent-color);
+        }
+        .btn-delete:hover {
+            color: #FF3B30;
+            border-color: #FF3B30;
+        }
+    </style>
+</head>
+<body>
+    <header id="navbar">
+        <div class="container nav-content">
+            <a href="index.html" class="logo" style="text-decoration: none;">Axon</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html#hero">기술</a></li>
+                    <li><a href="forum.html" style="color: var(--accent-color);">커뮤니티</a></li>
+                    <li><a href="index.html#features">주요 기능</a></li>
+                    <li><a href="index.html#developer">개발자</a></li>
+                </ul>
+            </nav>
+            <div class="nav-cta">
+                <button class="btn btn-primary-small">시작하기</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="forum-section">
+            <div class="forum-container">
+                <div class="forum-header-row">
+                    <div class="forum-title-area">
+                        <h1>커뮤니티 포럼</h1>
+                        <p>게시글 작성 시 비밀번호를 설정하여 관리할 수 있습니다.</p>
+                    </div>
+                    <button class="btn btn-primary" id="btn-open-modal">
+                        새 글 쓰기
+                    </button>
+                </div>
+
+                <div class="forum-list" id="posts-list">
+                    <div style="padding: 3rem; text-align: center; color: #8E8E93;">데이터를 불러오는 중...</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Post Create/Edit Modal -->
+    <div id="post-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:2.5rem; border-radius:20px; width:100%; max-width:500px; box-shadow:0 20px 50px rgba(0,0,0,0.2);">
+            <h2 id="modal-title" style="margin-bottom:1.5rem;">새 게시글 작성</h2>
+            <div style="display:flex; flex-direction:column; gap:1rem;">
+                <input type="text" id="input-title" placeholder="제목을 입력하세요" style="padding:12px; border:1px solid #E5E5E7; border-radius:8px;">
+                <input type="text" id="input-author" placeholder="작성자 이름" style="padding:12px; border:1px solid #E5E5E7; border-radius:8px;">
+                <input type="password" id="input-password" placeholder="비밀번호" style="padding:12px; border:1px solid #E5E5E7; border-radius:8px;">
+                <select id="input-category" style="padding:12px; border:1px solid #E5E5E7; border-radius:8px;">
+                    <option value="question">질문</option>
+                    <option value="sharing">공유</option>
+                    <option value="news">뉴스</option>
+                </select>
+                <div style="display:flex; gap:1rem; margin-top:1rem;">
+                    <button class="btn" id="btn-close-modal" style="flex:1; background:#F4F4F5;">취소</button>
+                    <button class="btn btn-primary" id="btn-submit-post" style="flex:1;">등록하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Axon 연구소. 모든 권리 보유.</p>
+        </div>
+    </footer>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: 'AIzaSyBBTIKKY3Eof0vcP7dtO3W8bqSVKlkpQas',
+            authDomain: 'axon-project-6ac75.firebaseapp.com',
+            projectId: 'axon-project-6ac75',
+            storageBucket: 'axon-project-6ac75.firebasestorage.app',
+            messagingSenderId: '864930393669',
+            appId: '1:864930393669:web:a22430068659405f53fd2c'
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const postsList = document.getElementById('posts-list');
+        const modal = document.getElementById('post-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const inputTitle = document.getElementById('input-title');
+        const inputAuthor = document.getElementById('input-author');
+        const inputPassword = document.getElementById('input-password');
+        const inputCategory = document.getElementById('input-category');
+        
+        let editingId = null;
+
+        function renderPosts(snapshot) {
+            postsList.innerHTML = '';
+            if (snapshot.empty) {
+                postsList.innerHTML = '<div style="padding: 3rem; text-align: center; color: #8E8E93;">작성된 게시글이 없습니다.</div>';
+                return;
+            }
+
+            snapshot.forEach(doc => {
+                const post = doc.data();
+                const id = doc.id;
+                const item = document.createElement('div');
+                item.className = 'forum-item';
+                
+                const tagLabel = { 'question': '질문', 'sharing': '공유', 'news': '뉴스' }[post.category] || '일반';
+                const tagClass = `tag tag-${post.category}`;
+
+                item.innerHTML = `
+                    <div class="post-title">${post.title}</div>
+                    <div class="post-author">${post.author}</div>
+                    <div class="post-date">${post.date}</div>
+                    <div class="post-category">
+                        <span class="${tagClass}">${tagLabel}</span>
+                    </div>
+                    <div class="post-actions">
+                        <button class="btn-icon" onclick="openEditModal('${id}', '${post.title}', '${post.author}', '${post.category}')">수정</button>
+                        <button class="btn-icon btn-delete" onclick="deletePost('${id}', '${post.password}')">삭제</button>
+                    </div>
+                `;
+                postsList.appendChild(item);
+            });
+        }
+
+        db.collection("posts").orderBy("createdAt", "desc").onSnapshot(renderPosts);
+
+        document.getElementById('btn-open-modal').onclick = () => {
+            editingId = null;
+            modalTitle.innerText = "새 게시글 작성";
+            inputTitle.value = "";
+            inputAuthor.value = "";
+            inputPassword.value = "";
+            modal.style.display = 'flex';
+        };
+
+        document.getElementById('btn-close-modal').onclick = () => modal.style.display = 'none';
+
+        function openEditModal(id, title, author, category) {
+            editingId = id;
+            modalTitle.innerText = "게시글 수정";
+            inputTitle.value = title;
+            inputAuthor.value = author;
+            inputPassword.value = "";
+            inputCategory.value = category;
+            modal.style.display = 'flex';
+        }
+
+        async function deletePost(id, correctPassword) {
+            const password = prompt("비밀번호를 입력하세요:");
+            if (password === correctPassword) {
+                if (confirm("정말로 삭제하시겠습니까?")) {
+                    await db.collection("posts").doc(id).delete();
+                }
+            } else {
+                alert("비밀번호가 일치하지 않습니다.");
+            }
+        }
+
+        document.getElementById('btn-submit-post').onclick = async () => {
+            const title = inputTitle.value;
+            const author = inputAuthor.value;
+            const password = inputPassword.value;
+            const category = inputCategory.value;
+            const date = new Date().toISOString().split('T')[0];
+
+            if (!title || !author || !password) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+
+            if (editingId) {
+                // Check password before editing
+                const doc = await db.collection("posts").doc(editingId).get();
+                if (doc.data().password !== password) {
+                    alert("비밀번호가 일치하지 않습니다.");
+                    return;
+                }
+                await db.collection("posts").doc(editingId).update({
+                    title, author, category
+                });
+            } else {
+                await db.collection("posts").add({
+                    title, author, password, category, date,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+            modal.style.display = 'none';
+        };
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

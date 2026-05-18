@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axon - 움직이는 지능 (Portfolio)</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- SEO & Accessibility -->
+    <meta name="description" content="동양미래대학교 로봇소프트웨어과 개발자의 피지컬 AI 지능 제어 인터페이스 포트폴리오.">
+    
+    <!-- Firebase Compat SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="intro-active">
+    <!-- Safety Rail -->
+    <script>
+        window.introSafetyTimeout = setTimeout(function() {
+            document.body.classList.remove('intro-active');
+            var splash = document.getElementById('splash-screen');
+            if (splash) splash.style.display = 'none';
+        }, 10000);
+    </script>
+
+    <!-- Intro Layer -->
+    <div id="splash-screen" role="button" aria-label="인트로 시작하기">
+        <video id="splash-video" src="111080-689949750_medium.mp4" autoplay loop muted playsinline aria-hidden="true"></video>
+        <div id="initiate-text">CLICK TO INITIATE</div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" aria-live="polite"></div>
+
+    <!-- Password Modal -->
+    <div id="pwd-modal-overlay" class="modal-overlay">
+        <div class="custom-modal" role="dialog" aria-labelledby="pwd-modal-title">
+            <h3 id="pwd-modal-title" style="margin-bottom: 1.5rem; font-weight: 800;">비밀번호 확인</h3>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">작업을 완료하려면 비밀번호를 입력하세요.</p>
+            <div class="modal-body">
+                <input type="password" id="input-confirm-password" placeholder="비밀번호" style="width: 100%; padding: 12px; border: 1px solid #EEE; border-radius: 8px; margin-bottom: 1.5rem;">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" id="btn-close-pwd-modal" style="flex: 1; background: #F5F5F7;" aria-label="취소">취소</button>
+                <button class="btn btn-primary" id="btn-confirm-pwd" style="flex: 1;" aria-label="확인">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content-wrapper">
+        <header id="navbar">
+            <div class="container nav-content">
+                <a href="#" class="logo" aria-label="Axon 홈페이지 로고">Axon</a>
+                <nav role="navigation">
+                    <ul class="nav-links" id="nav-menu">
+                        <li><a href="#hero" aria-label="홈으로 이동">홈</a></li>
+                        <li><a href="#features" aria-label="프로그래밍 언어 섹션으로 이동">프로그래밍 언어</a></li>
+                        <li><a href="#courses" aria-label="코스 목록으로 이동">코스 목록</a></li>
+                        <li><a href="#instructor" aria-label="강사 소개 섹션으로 이동">강사 소개</a></li>
+                        <li><a href="#testimonials" aria-label="수강 후기 섹션으로 이동">수강 후기</a></li>
+                        <li><a href="#faq" aria-label="자주 묻는 질문 섹션으로 이동">FAQ</a></li>
+                        <li><a href="#community" aria-label="커뮤니티 섹션으로 이동">커뮤니티</a></li>
+                    </ul>
+                </nav>
+
+                <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="메뉴 열기">
+                    <div class="hamburger"></div>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Hero -->
+            <section id="hero" aria-labelledby="hero-title">
+                <div class="dot-grid"></div>
+                <div class="container hero-container reveal">
+                    <div class="hero-text">
+                        <div class="title-perspective-container">
+                            <h1 class="main-copy" id="main-title"></h1>
+                        </div>
+                        <p class="sub-copy" style="font-weight: 400; line-height: 1.7;">기초 문법부터 실전 프로젝트, 그리고 하드웨어 제어까지. 상상을 현실로 만드는 진짜 코딩의 기술을 배웁니다.</p>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="code-editor">
+                            <div class="editor-header">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                            </div>
+                            <pre><code id="typewriter"></code></pre>
+                        </div>
+                    </div>
+                </div>
+                <!-- Scroll Indicator -->
+                <div class="scroll-indicator">
+                    <span style="font-size: 0.75rem; letter-spacing: 2px; color: #86868B; font-weight: 600;">SCROLL DOWN</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#86868B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bounce-arrow"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                </div>
+            </section>
+
+            <!-- Features -->
+            <section id="features" aria-labelledby="features-title">
+                <div class="container">
+                    <div class="section-header reveal" style="text-align: center; margin-bottom: 4rem;">
+                        <h2 id="features-title" style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.05em;">프로그래밍 언어</h2>
+                        <p style="color: var(--text-secondary); font-size: 1.15rem; margin-top: 1rem;">각 언어의 특징과 활용 분야를 확인하고 나만의 무기를 선택하세요.</p>
+                    </div>
+                    <div class="features-grid">
+                        <div class="feature-card reveal" role="article">
+                            <div class="icon-wrapper" aria-hidden="true">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10z"></path><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"></path></svg>
+                            </div>
+                            <h3>Python</h3>
+                            <p>문법이 직관적이고 간결하여 입문자가 배우기 가장 좋은 언어입니다. 주로 인공지능(AI) 모델 개발, 데이터 분석, 그리고 백엔드 웹 서버 구축에 광범위하게 쓰입니다.</p>
+                        </div>
+                        <div class="feature-card reveal" role="article">
+                            <div class="icon-wrapper" aria-hidden="true">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            </div>
+                            <h3>JavaScript</h3>
+                            <p>전 세계의 웹사이트를 움직이게 하는 웹 표준 언어입니다. 눈에 보이는 화려한 웹 인터페이스(프론트엔드)부터 서버 개발(Node.js)까지 모두 소화할 수 있습니다.</p>
+                        </div>
+                        <div class="feature-card reveal" role="article">
+                            <div class="icon-wrapper" aria-hidden="true">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            </div>
+                            <h3>C / C++</h3>
+                            <p>하드웨어와 가장 가깝게 소통할 수 있어 압도적인 실행 속도를 자랑합니다. 로봇 모터 제어, 임베디드 기기, 고성능 게임 엔진 등 하드웨어의 성능을 한계까지 끌어올릴 때 사용됩니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Courses -->
+            <section id="courses" aria-labelledby="courses-title">
+                <div class="container">
+                    <div class="section-header reveal" style="text-align: center; margin-bottom: 4rem;">
+                        <h2 id="courses-title" style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.05em;">배우고 싶은 언어를 선택하세요</h2>
+                        <p style="color: var(--text-secondary); font-size: 1.15rem; margin-top: 1rem;">기초부터 실무까지, 당신의 목표에 맞는 최적의 로드맵</p>
+                    </div>
+                    <div class="courses-grid">
+                        <div class="course-card reveal">
+                            <div class="difficulty" aria-label="난이도: 초급">⭐ 초급</div>
+                            <h3>Python</h3>
+                            <p>가장 배우기 쉬운 언어로 프로그래밍의 기초를 탄탄히 다집니다.</p>
+                            <button class="btn btn-primary btn-enroll" data-course="Python 기초">수강 신청하기</button>
+                        </div>
+                        <div class="course-card reveal">
+                            <div class="difficulty" aria-label="난이도: 중급">⭐⭐ 중급</div>
+                            <h3>JavaScript</h3>
+                            <p>웹 프론트엔드와 백엔드를 아우르는 동적인 웹 애플리케이션 개발.</p>
+                            <button class="btn btn-primary btn-enroll" data-course="JavaScript 마스터">수강 신청하기</button>
+                        </div>
+                        <div class="course-card reveal">
+                            <div class="difficulty" aria-label="난이도: 고급">⭐⭐⭐ 고급</div>
+                            <h3>C/C++</h3>
+                            <p>메모리 제어와 임베디드, 시스템 프로그래밍을 위한 핵심 언어.</p>
+                            <button class="btn btn-primary btn-enroll" data-course="C/C++ 시스템 프로그래밍">수강 신청하기</button>
+                        </div>
+                        <div class="course-card reveal">
+                            <div class="difficulty" aria-label="난이도: 중급">⭐⭐ 중급</div>
+                            <h3>파이썬 데이터 분석</h3>
+                            <p>데이터 수집부터 시각화, AI 모델링까지 실무 데이터 분석 기술.</p>
+                            <button class="btn btn-primary btn-enroll" data-course="파이썬 데이터 분석">수강 신청하기</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Instructor -->
+            <section id="instructor" aria-labelledby="instructor-title">
+                <div class="container">
+                    <div class="section-header reveal" style="text-align: center; margin-bottom: 4rem;">
+                        <h2 id="instructor-title" style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.05em;">분야별 최고에게 배우는 진짜 코딩</h2>
+                        <p style="color: var(--text-secondary); font-size: 1.15rem; margin-top: 1rem;">대학 정규 과정 수준의 깊이와 실무의 감각을 동시에 전달하는 로봇소프트웨어 전공 마스터 강사진입니다.</p>
+                    </div>
+                    <div class="instructor-container reveal">
+                        <!-- Instructor 1 -->
+                        <div class="instructor-card">
+                            <div class="instructor-profile">
+                                <div class="instructor-image"></div>
+                                <h3>이O철 마스터</h3>
+                                <p class="instructor-role">Python (실무 자동화 & 객체지향 프로그래밍)</p>
+                                <p class="instructor-desc">"파이썬의 기초 문법부터 실무 자동화, 객체지향 프로그래밍까지. 복잡한 시스템이 흐르는 원리를 가장 명확하고 직관적으로 짚어드립니다."</p>
+                            </div>
+                            <button class="btn btn-outline btn-curriculum" data-instructor="leejung">상세 커리큘럼 보기</button>
+                        </div>
+                        
+                        <!-- Instructor 2 -->
+                        <div class="instructor-card">
+                            <div class="instructor-profile">
+                                <div class="instructor-image"></div>
+                                <h3>황O규 마스터</h3>
+                                <p class="instructor-role">C# 윈도우 프로그래밍</p>
+                                <p class="instructor-desc">"프로그래밍의 근본인 C언어부터 로봇 하드웨어 제어까지. 시스템의 심장을 직접 다루고 최적화하는 한계 없는 코딩을 가르칩니다."</p>
+                            </div>
+                            <button class="btn btn-outline btn-curriculum" data-instructor="hwang">상세 커리큘럼 보기</button>
+                        </div>
+
+                        <!-- Instructor 3 -->
+                        <div class="instructor-card">
+                            <div class="instructor-profile">
+                                <div class="instructor-image"></div>
+                                <h3>김O원 마스터</h3>
+                                <p class="instructor-role">Java 기반 IoT & 마이크로컨트롤러</p>
+                                <p class="instructor-desc">"객체지향 프로그래밍의 정수 Java. 튼튼한 뼈대를 세우고 견고하며 확장성 있는 대규모 소프트웨어 설계의 기틀을 마련해 드립니다."</p>
+                            </div>
+                            <button class="btn btn-outline btn-curriculum" data-instructor="lee">상세 커리큘럼 보기</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonials -->
+            <section id="testimonials" aria-labelledby="testimonials-title">
+                <div class="container">
+                    <div class="section-header reveal" style="text-align: center; margin-bottom: 4rem;">
+                        <h2 id="testimonials-title" style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.05em;">수강생들의 생생한 후기</h2>
+                    </div>
+                    <div class="testimonials-grid reveal">
+                        <div class="testimonial-card">
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                            <p class="review-text">"비전공자도 이해하기 쉽게 원리부터 짚어주십니다! 단순히 코드만 따라치는 것이 아니라 왜 그렇게 되는지 원리를 배울 수 있었습니다."</p>
+                            <p class="reviewer">- 박O진 (비전공자, Python 기초반 수강)</p>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                            <p class="review-text">"C언어의 포인터가 드디어 이해됐습니다. 시스템 제어의 기본기를 완벽하게 다지고 다음 단계로 넘어갈 수 있는 최고의 강의입니다."</p>
+                            <p class="reviewer">- 최O민 (전공자, C/C++ 심화반 수강)</p>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                            <p class="review-text">"자바의 객체지향 개념이 확실히 잡혔습니다. 강사님의 밀착 멘토링 덕분에 프로젝트까지 무사히 완성할 수 있었어요."</p>
+                            <p class="reviewer">- 김O수 (비전공자, Java 마스터반 수강)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Roadmap -->
+            <section id="roadmap" aria-labelledby="roadmap-title">
+                <div class="container">
+                    <div class="section-header reveal" style="text-align: center; margin-bottom: 4rem;">
+                        <h2 id="roadmap-title" style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.05em;">왕초보에서 실무자까지, 완벽한 커리큘럼</h2>
+                    </div>
+                    <div class="timeline reveal">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h3>Step 1. 기초 문법</h3>
+                                <p>프로그래밍 언어의 뼈대를 세우고 코딩에 대한 두려움을 없앱니다. 자료형, 제어문, 함수 등 필수 기초를 탄탄하게 다집니다.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h3>Step 2. 객체지향 및 심화</h3>
+                                <p>객체지향 패러다임, 메모리 관리, 데이터 구조 등 실무 개발자가 되기 위한 심화 과정을 학습하고 컴퓨팅 사고력을 기릅니다.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h3>Step 3. 실전 프로젝트</h3>
+                                <p>팀 단위 프로젝트를 통해 협업 능력을 기르고, 실제 서비스에 적용 가능한 포트폴리오를 완성합니다. 코드 리뷰와 피드백이 진행됩니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ -->
+            <section id="faq" aria-labelledby="faq-title">
+                <div class="container">
+                    <div class="section-header reveal" style="text-align: center; margin-bottom: 4rem;">
+                        <h2 id="faq-title" style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.05em;">자주 묻는 질문</h2>
+                    </div>
+                    <div class="faq-container reveal">
+                        <div class="faq-item">
+                            <button class="faq-question">비전공자도 수강할 수 있나요? <span class="faq-icon">+</span></button>
+                            <div class="faq-answer">
+                                <p>네, 물론입니다! 저희 교육 과정은 프로그래밍을 처음 접하는 비전공자도 기초부터 차근차근 배울 수 있도록 설계되었습니다. 어려운 용어보다는 이해하기 쉬운 비유와 실습 위주로 수업이 진행됩니다.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-question">어떤 컴퓨터(노트북)가 필요한가요? <span class="faq-icon">+</span></button>
+                            <div class="faq-answer">
+                                <p>일반적인 웹 개발 및 프로그래밍 학습을 위해서는 RAM 8GB 이상, SSD 256GB 이상의 노트북을 권장합니다. Windows 환경과 Mac 환경 모두 실습이 가능하며, 수업 중 필요한 설치 과정은 강사진이 직접 안내해 드립니다.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-question">수업 방식은 어떻게 되나요? <span class="faq-icon">+</span></button>
+                            <div class="faq-answer">
+                                <p>모든 수업은 이론 30%, 실습 70% 비율로 진행됩니다. 단순히 눈으로 보는 것이 아니라 직접 코드를 타이핑하고 실행해 보는 것을 원칙으로 하며, 1:1 코드 리뷰를 통해 실력을 확실히 끌어올립니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Community -->
+            <section id="community" class="reveal" aria-labelledby="community-title">
+                <div class="container">
+                    <div class="forum-container">
+                        <div class="forum-header-row">
+                            <div class="forum-title-area">
+                                <h2 id="community-title">자유게시판</h2>
+                            </div>
+                            <button class="btn btn-primary" id="btn-open-modal" aria-label="새 게시글 작성 메뉴 열기">게시글 작성</button>
+                        </div>
+                        <div class="forum-filters" style="display: flex; gap: 10px; margin-bottom: 2rem;">
+                            <button class="filter-btn active" data-filter="all">전체</button>
+                            <button class="filter-btn" data-filter="news">뉴스 📢</button>
+                            <button class="filter-btn" data-filter="question">질문 ❓</button>
+                            <button class="filter-btn" data-filter="sharing">코드리뷰 💻</button>
+                        </div>
+                        <div class="forum-list" id="posts-list">
+                            <div style="padding: 3rem; text-align: center; color: #8E8E93;">불러오는 중...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer style="padding: 60px 0; border-top: 1px solid #F2F2F2; text-align: center; background-color: #FFFFFF;">
+            <div class="container">
+                <div style="margin-bottom: 1.5rem; display: flex; justify-content: center; gap: 2rem;">
+                    <a href="#courses" style="color: #666; text-decoration: none; font-size: 0.95rem; font-weight: 500;">코스 목록</a>
+                    <a href="#community" style="color: #666; text-decoration: none; font-size: 0.95rem; font-weight: 500;">커뮤니티</a>
+                    <a href="#instructor" style="color: #666; text-decoration: none; font-size: 0.95rem; font-weight: 500;">강사 소개</a>
+                </div>
+                <p style="font-size: 0.85rem; color: #999;">&copy; 2026 동양미래대학교 로봇소프트웨어 전공 마스터 코딩 아카데미.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Post Modal -->
+    <div id="post-modal" class="modal-overlay" aria-hidden="true">
+        <div class="custom-modal">
+            <h3 style="margin-bottom:1.5rem; font-weight:800;">게시글 등록</h3>
+            <div class="modal-body" style="display:flex; flex-direction:column; gap:1rem;">
+                <input type="text" id="input-title" placeholder="제목" aria-label="게시글 제목">
+                <input type="text" id="input-author" placeholder="닉네임" aria-label="작성자 이름">
+                <input type="password" id="input-password" placeholder="비밀번호" aria-label="게시글 비밀번호">
+                <select id="input-category" aria-label="카테고리 선택">
+                    <option value="news">뉴스</option><option value="question">질문</option><option value="sharing">공유</option>
+                </select>
+                <div style="display:flex; gap:10px; margin-top:1rem;">
+                    <button class="btn" id="btn-close-modal" style="flex:1; background:#F5F5F7;">취소</button>
+                    <button class="btn btn-primary" id="btn-submit-post" style="flex:1;">업로드</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Enrollment Modal -->
+    <div id="enroll-modal" class="modal-overlay" aria-hidden="true">
+        <div class="custom-modal">
+            <h3 style="margin-bottom:1.5rem; font-weight:800;">수강 신청</h3>
+            <div class="modal-body" style="display:flex; flex-direction:column; gap:1rem;">
+                <input type="text" id="enroll-course-name" readonly style="background-color: #f5f5f5; color: #666;" aria-label="선택한 코스명">
+                <input type="text" id="enroll-name" placeholder="이름" aria-label="이름">
+                <input type="email" id="enroll-email" placeholder="이메일" aria-label="이메일">
+                <div style="display: flex; flex-direction: column;">
+                    <textarea id="enroll-goal" maxlength="500" placeholder="학습 목표를 간단히 적어주세요" rows="3" aria-label="학습 목표" style="padding: 12px; border: 1px solid #EEE; border-radius: 8px; font-family: inherit; resize: none;"></textarea>
+                    <div id="char-counter" style="text-align: right; font-size: 0.75rem; color: #8E8E93; margin-top: -10px; margin-bottom: 10px;">(0/500)</div>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:1rem;">
+                    <button class="btn" id="btn-close-enroll-modal" style="flex:1; background:#F5F5F7;">취소</button>
+                    <button class="btn btn-primary" id="btn-submit-enroll" style="flex:1;">신청 완료</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal-overlay" aria-hidden="true">
+        <div class="success-modal-content">
+            <div class="success-icon">✨</div>
+            <h3 class="success-title">수강 신청 완료!</h3>
+            <p class="success-desc">정상적으로 접수되었습니다.<br>입력하신 이메일로 상세 안내문을 발송해 드렸습니다.</p>
+            <button class="btn btn-primary" id="btn-close-success" style="width: 100%;">확인</button>
+        </div>
+    </div>
+
+    <!-- Curriculum Modal -->
+    <div id="curriculum-modal" class="modal-overlay" style="display: none;">
+        <div class="curriculum-modal-content">
+            <button class="modal-close-btn">&times;</button>
+            <div id="modal-table-container">
+                
+                <div id="curriculum-content-leejung" class="curriculum-instructor-block" style="display: none;">
+                    <div class="instructor-curriculum-tabs">
+                        <div class="curriculum-tabs">
+                            <button class="curriculum-tab-btn active" data-tab="tab-leejung-basic">기본 과정</button>
+                            <button class="curriculum-tab-btn" data-tab="tab-leejung-core">핵심 과정</button>
+                            <button class="curriculum-tab-btn" data-tab="tab-leejung-project">실무 프로젝트</button>
+                        </div>
+                        <div class="curriculum-table-container">
+                            <div class="curriculum-tab-content active" id="tab-leejung-basic">
+                                <table class="curriculum-table">
+                                    <tr>
+                                        <td class="col-step">기본</td>
+                                        <td class="col-badge"><span class="badge-orange">이O철의 파이썬 입문</span></td>
+                                        <td class="col-desc">
+                                            <div class="desc-title">Computational Thinking 및 Python 기초 문법 마스터</div>
+                                            <div class="desc-text">프로그램의 논리적 흐름을 짜는 순서도 작성법 학습. 파이썬의 변수, 연산자, 반복문, 함수 및 파일 입출력 등 프로그램 작성에 필요한 기초 명령 체계 완벽 습득.</div>
+                                            <div class="signature-badge">signature</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="curriculum-tab-content" id="tab-leejung-core">
+                                <table class="curriculum-table">
+                                    <tr>
+                                        <td class="col-step">핵심</td>
+                                        <td class="col-badge"><span class="badge-orange">이O철의 객체지향 분석</span></td>
+                                        <td class="col-desc">
+                                            <div class="desc-title">클래스(Class)와 객체(Instance) 중심의 심화 실무 프로그래밍</div>
+                                            <div class="desc-text">클래스 속성과 객체 속성의 구조적 이해. 복잡한 시스템 개발의 핵심이 되는 클래스의 상속, 다형성, 접근 제어(Access Control) 개념을 실제 코드 예제를 통해 완벽하게 응용 및 구현.</div>
+                                            <div class="signature-badge">signature</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="curriculum-tab-content" id="tab-leejung-project">
+                                <table class="curriculum-table">
+                                    <tr>
+                                        <td class="col-step">실무</td>
+                                        <td class="col-badge"><span class="badge-orange">이O철의 시그니처 자동화</span></td>
+                                        <td class="col-desc">
+                                            <div class="desc-title">Visual Studio Code 기반 비즈니스 업무 자동화 및 데이터 처리 프로젝트</div>
+                                            <div class="desc-text">[실제 대학 강의 기준 완벽 마감] 파이썬을 활용하여 업무에 필요한 실무적인 자동화 프로그램을 직접 디자인하고 배포하는 과정. 텍스트 및 데이터 구조 파싱, 파일 일괄 처리 시스템을 최종 작성하고 디버깅하는 프로젝트 중심 과정.</div>
+                                            <div class="signature-badge">signature</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-enroll" data-course="Python 실무 자동화 및 객체지향 프로그래밍" style="margin-top: 1.5rem; align-self: flex-start;">이 과정 수강 신청하기</button>
+                    </div>
+                </div>
+
+                <div id="curriculum-content-hwang" class="curriculum-instructor-block" style="display: none;">
+                    <div class="instructor-curriculum-tabs">
+                        <div class="curriculum-tabs">
+                            <button class="curriculum-tab-btn active" data-tab="tab-hwang-basic">기본 과정</button>
+                            <button class="curriculum-tab-btn" data-tab="tab-hwang-core">핵심 과정</button>
+                            <button class="curriculum-tab-btn" data-tab="tab-hwang-project">실무 프로젝트</button>
+                        </div>
+                        <div class="curriculum-table-container">
+                            <div class="curriculum-tab-content active" id="tab-hwang-basic">
+                                <table class="curriculum-table">
+                                    <tr>
+                                        <td class="col-step">기본</td>
+                                        <td class="col-badge"><span class="badge-orange">황O규의 기본</span></td>
+                                        <td class="col-desc">
+                                            <div class="desc-title">Visual Studio .NET 및 C# 프로그래밍 입문</div>
+                                            <div class="desc-text">C#의 기본 문법과 .NET 개발 환경 완벽 적응. 자동화 프로그램 개발을 위한 기본 뼈대를 다지는 핵심 입문 과정</div>
+                                            <div class="signature-badge">signature</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="curriculum-tab-content" id="tab-hwang-core">
+                                <table class="curriculum-table">
+                                    <tr>
+                                        <td class="col-step">핵심</td>
+                                        <td class="col-badge"><span class="badge-orange">황O규의 핵심 분석</span></td>
+                                        <td class="col-desc">
+                                            <div class="desc-title">C# 윈도우 프로그래밍 실무</div>
+                                            <div class="desc-text">Windows Forms 아키텍처 이해 및 UI 디자인. 컨트롤 제어와 이벤트 핸들링을 통해 실제 작동하는 데스크톱 어플리케이션 구현</div>
+                                            <div class="signature-badge">signature</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="curriculum-tab-content" id="tab-hwang-project">
+                                <table class="curriculum-table">
+                                    <tr>
+                                        <td class="col-step">실무</td>
+                                        <td class="col-badge"><span class="badge-orange">황O규의 시그니처 자동화</span></td>
+                                        <td class="col-desc">
+                                            <div class="desc-title">로봇 및 하드웨어 자동화 연동 프로그래밍</div>
+                                            <div class="desc-text">C#을 이용하여 기계 및 로봇 자동화 관련 윈도우 제어 프로그램을 최종 작성하고 디버깅하는 프로젝트 중심 과정</div>
+                                            <div class="signature-badge">signature</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-enroll" data-course="C# 윈도우 프로그래밍" style="margin-top: 1.5rem; align-self: flex-start;">이 과정 수강 신청하기</button>
+                    </div>
+                </div>
+
+                <div id="curriculum-content-lee" class="curriculum-instructor-block" style="display: none;">
+                    <div class="instructor-curriculum-tabs">
+                        <div class="curriculum-tabs">
+                            <button class="curriculum-tab-btn active" data-tab="tab-lee-basic">기본 과정</button>
+                            <button class="curriculum-tab-btn" data-tab="tab-lee-core">핵심 과정</button>
+                            <button class="curriculum-tab-btn" data-tab="tab-lee-project">실무 프로젝트</button>
+                        </div>
+                        <div class="curriculum-table-container">
+                            <div class="curriculum-tab-content active" id="tab-lee-basic">
+                                <table class="curriculum-table">
+                                    <tr>
+                                        <td class="col-step">기본</td>
+                                        <td class="col-badge"><span class="badge-orange">김O원의 Java 입문</span></td>
+                                        <td class="col-desc">
+                                            <div class="desc-title">Java 객체지향 기초 및 마이크로컨트롤러 통신 환경 설정</div>
+                                            <div class="desc-text">Java의 핵심 문법과 객체지향 뼈대 학습. 아두이노 하드웨어 구성 및 Java 시리얼 입출력 라이브러리(RXTX/jSerialComm)를 활용한 기초 데이터 연동 환경 구축.</div>
+                                            <div class="signature-badge">signature</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="curriculum-tab-content" id="tab-lee-core">
+                                <table class="curriculum-table">
+                                    <tr>
+                                        <td class="col-step">핵심</td>
+                                        <td class="col-badge"><span class="badge-orange">김O원의 Java IoT 제어</span></td>
+                                        <td class="col-desc">
+                                            <div class="desc-title">Java 스레드 기반 센서 데이터 처리 및 모터 제어</div>
+                                            <div class="desc-text">멀티스레딩을 활용한 초음파·적외선 센서 데이터의 실시간 흐름 제어. Java 코드로 제어하는 RC 서보 모터, DC 모터, 스테퍼 모터의 구동 원리 이해 및 하드웨어 융합 시스템 설계 실습.</div>
+                                            <div class="signature-badge">signature</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="curriculum-tab-content" id="tab-lee-project">
+                                <table class="curriculum-table">
+                                    <tr>
+                                        <td class="col-step">실무</td>
+                                        <td class="col-badge"><span class="badge-orange">김O원의 시그니처 융합 아키텍처</span></td>
+                                        <td class="col-desc">
+                                            <div class="desc-title">비차단(Non-blocking) 네트워크 및 무선 통신 융합 프로젝트</div>
+                                            <div class="desc-text">delay() 없는 상태 머신 구조 기반의 비차단 제어 기법 마스터. Bluetooth 및 IoT 통신 모듈과 Java 소켓 프로그래밍을 결합한 복합적인 무선 원격 제어 스마트 시스템 최종 구현.</div>
+                                            <div class="signature-badge">signature</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-enroll" data-course="Java 기반 IoT & 마이크로컨트롤러" style="margin-top: 1.5rem; align-self: flex-start;">이 과정 수강 신청하기</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button id="scroll-top-btn" class="scroll-top-btn" aria-label="맨 위로 스크롤">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+    </button>
+
+    <script src="script.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: 'AIzaSyBBTIKKY3Eof0vcP7dtO3W8bqSVKlkpQas',
+            authDomain: 'axon-project-6ac75.firebaseapp.com',
+            projectId: 'axon-project-6ac75',
+            storageBucket: 'axon-project-6ac75.firebasestorage.app',
+            messagingSenderId: '864930393669',
+            appId: '1:864930393669:web:a22430068659405f53fd2c'
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const splash = document.getElementById('splash-screen');
+        splash.addEventListener('click', () => {
+            clearTimeout(window.introSafetyTimeout);
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                document.body.classList.remove('intro-active');
+                splash.style.display = 'none';
+            }, 600);
+        });
+    </script>
+</body>
+</html>
