@@ -3,27 +3,54 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Mobile Menu Toggle
     const mobileToggle = document.getElementById('mobile-toggle');
     const navMenu = document.getElementById('nav-menu');
-    const hamburger = document.querySelector('.hamburger');
     
     if (mobileToggle) {
         mobileToggle.addEventListener('click', () => {
             navMenu.classList.toggle('active');
             mobileToggle.classList.toggle('is-active');
-            // Basic animation toggle
-            if (navMenu.classList.contains('active')) {
-                hamburger.style.background = 'transparent';
-            } else {
-                hamburger.style.background = 'var(--text-primary)';
-            }
+            
+            // 접근성 속성 토글
+            const isExpanded = mobileToggle.classList.contains('is-active');
+            mobileToggle.setAttribute('aria-expanded', isExpanded);
+            mobileToggle.setAttribute('aria-label', isExpanded ? '메뉴 닫기' : '메뉴 열기');
         });
 
         navMenu.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 navMenu.classList.remove('active');
-                hamburger.style.background = 'var(--text-primary)';
+                mobileToggle.classList.remove('is-active');
+                mobileToggle.setAttribute('aria-expanded', false);
+                mobileToggle.setAttribute('aria-label', '메뉴 열기');
             });
         });
     }
+
+    // 1.5 Scroll Spy for Nav Links
+    const sections = document.querySelectorAll('section, header');
+    const navItems = document.querySelectorAll('.nav-links a');
+
+    window.addEventListener('scroll', () => {
+        let current = 'hero';
+        const scrollY = window.pageYOffset;
+        
+        sections.forEach(section => {
+            const sectionHeight = section.offsetHeight;
+            const sectionTop = section.offsetTop - 100;
+            if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        // 맨 위면 무조건 hero
+        if (scrollY < 50) current = 'hero';
+
+        navItems.forEach(a => {
+            a.classList.remove('active');
+            if (a.getAttribute('href') === `#${current}`) {
+                a.classList.add('active');
+            }
+        });
+    });
 
     // 2. Toast Notification System
     const toastContainer = document.getElementById('toast-container');
@@ -477,5 +504,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 behavior: 'smooth'
             });
         });
+    }
+
+    // Sticky Banner Countdown Logic
+    const stickyBanner = document.getElementById('sticky-banner');
+    const cdDays = document.getElementById('cd-days');
+    const cdHours = document.getElementById('cd-hours');
+    const cdMins = document.getElementById('cd-mins');
+    const cdSecs = document.getElementById('cd-secs');
+
+    if (stickyBanner && cdDays) {
+        // Show banner after short delay
+        setTimeout(() => {
+            stickyBanner.style.transform = 'translateY(0)';
+        }, 1000);
+
+        function updateCountdown() {
+            const now = new Date();
+            const target = new Date();
+            // 오늘 밤 23시 59분 59초 마감
+            target.setHours(23, 59, 59, 999);
+            
+            let diff = target - now;
+            if (diff < 0) {
+                target.setDate(target.getDate() + 1);
+                diff = target - now;
+            }
+
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diff / 1000 / 60) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+
+            cdDays.textContent = String(d).padStart(2, '0');
+            cdHours.textContent = String(h).padStart(2, '0');
+            cdMins.textContent = String(m).padStart(2, '0');
+            cdSecs.textContent = String(s).padStart(2, '0');
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
     }
 });
